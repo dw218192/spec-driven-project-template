@@ -1,0 +1,28 @@
+# Independent re-run of the spec's frozen criteria. The integrity model has the
+# impl gate AND CI re-run them (docs/process.md) — this is the CI half. It no-ops until
+# the project is bootstrapped: a committed `pixi.lock` (real deps added via `pixi add`).
+# The template ships a skeleton `pixi.toml` but no lock, so it stays a green no-op here
+# until you bootstrap (see AGENTS.md) — guarding on pixi.toml's mere existence would try
+# to `pixi run check` a zero-dependency skeleton and fail.
+name: check
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard — runs only once bootstrapped (committed pixi.lock)
+        id: guard
+        run: |
+          if [ -f pixi.lock ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No pixi.lock yet — bootstrap the project (pixi add …; see AGENTS.md). Skipping check."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: prefix-dev/setup-pixi@v0
+        if: steps.guard.outputs.ready == 'true'
+      - name: pixi run check
+        if: steps.guard.outputs.ready == 'true'
+        run: pixi run check

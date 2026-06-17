@@ -1,0 +1,22 @@
+# Skeleton — fill in for THIS project's stack (see AGENTS.md). The four [tasks] below
+# are the required contract: a spec freezes them as criteria, and the impl gate + CI
+# re-run them. Adapt the `tasks/*.py` skeletons for your stack, pick channels/platforms,
+# and add deps with `pixi add` (not by hand-editing this file).
+# Docs: https://pixi.sh  ·  pixi.toml validates against pixi's JSON Schema (SchemaStore).
+
+[workspace]
+name = "project"                  # rename
+channels = ["conda-forge"]        # add channels your dependencies need
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+# Add with `pixi add <pkg>`. The default tasks/*.py assume Python: `pixi add pytest ruff python-build`.
+# e.g. python = ">=3.11"
+
+[tasks]
+test  = "python tasks/test.py"               # skeletons in tasks/ — default to pytest/ruff/build; adapt
+lint  = "python tasks/lint.py"
+fmt   = "python tasks/fmt.py"
+build = "python tasks/build.py"
+check = { depends-on = ["lint", "test"] }    # default criterion: `pixi run check`
+gen-agents = "python .agent/scripts/gen_agents.py"  # framework: regenerate .claude/.codex subagents + skills from .agent/agents/ + .agent/skills/

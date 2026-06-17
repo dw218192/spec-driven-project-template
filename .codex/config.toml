@@ -1,0 +1,31 @@
+# Codex project config — wires the spec/ADR/spike process for OpenAI Codex.
+#
+# Agent DEFINITIONS load automatically from .codex/agents/, but Codex never
+# DELEGATES on its own — invoke `spec_gate` / `impl_gate` by name. Hooks are ON by default (no flag
+# needed). TRUST NOTE: a freshly-cloned repo is "untrusted" and Codex IGNORES this
+# whole .codex/ layer until you trust the project.
+
+# --- PreToolUse: deny edits to accepted ADRs (immutability) ---
+# Codex sends edits as `apply_patch` (aliases Edit/Write); the guard parses the
+# target path out of the patch text. Paths below assume the session runs at the
+# repo root; the bash form resolves the root via git for safety.
+[[hooks.PreToolUse]]
+matcher = "^(apply_patch|Edit|Write)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/.agent/scripts/adr_immutable.py"'
+commandWindows = 'python ".agent\scripts\adr_immutable.py"'
+timeout = 30
+
+# --- Stop: push Codex memories (~/.codex/memories) to its git remote each turn ---
+# If hooks do not fire on your build (open Windows/regression issue), use the
+# `notify` fallback in your USER config instead — see .codex/README.md.
+[[hooks.Stop]]
+matcher = ""
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/.agent/scripts/memory_push.py" --codex'
+commandWindows = 'python ".agent\scripts\memory_push.py" --codex'
+timeout = 60

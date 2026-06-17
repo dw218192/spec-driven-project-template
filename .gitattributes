@@ -1,0 +1,4 @@
+# Normalize text to LF in the repo and on checkout (cross-platform). Shell scripts
+# MUST stay LF or they break on Unix; PowerShell stays CRLF on Windows.
+* text=auto eol=lf
+*.ps1 text eol=crlf

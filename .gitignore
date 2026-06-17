@@ -1,0 +1,26 @@
+# pixi
+.pixi/
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+
+# build output (the default `pixi run build` emits build/ + dist/; add your stack's)
+build/
+dist/
+# target/        # Rust (cargo)
+# node_modules/  # JS/TS
+
+# generated agent surface — `pixi run gen-agents` rebuilds it from .agent/ (bootstrap runs it)
+.claude/agents/
+.claude/skills/
+.codex/agents/
+.codex/skills/
+
+# os / editor
+.DS_Store
+Thumbs.db
