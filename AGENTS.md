@@ -42,13 +42,19 @@ respects neither `.gitignore` nor a project model (e.g. `gofmt`), scope it to
 
 ## Environment, packages & tools — always via pixi
 
-This project's environment, dependencies, and runnable commands all live in pixi
-(`pixi.toml`, or `pyproject.toml` `[tool.pixi]`). **pixi owns them — route everything
-through it.** Never `pip install`, and never call `python` / `pytest` / a tool
-directly; run it inside the env. (pixi ships no official agent guidance, so these are
-the rules.) **One exception:** the framework's own stdlib-only helper scripts
-(`.agent/scripts/*.py`) are invoked directly with
-`python` — they need no project env and run even before bootstrap.
+pixi owns this project's **tooling environment** — the toolchain, the linters / formatters
+/ test & build runners your criteria invoke, and the Python the framework scripts need —
+all pinned in `pixi.lock` (`pixi.toml`, or `pyproject.toml` `[tool.pixi]`). **Route every
+tool through it**: never `pip install`, and never call `python` / `pytest` / a tool
+directly — run it inside the env. **One exception:** the framework's own stdlib-only
+helper scripts (`.agent/scripts/*.py`) run directly with `python` (no project env, even
+before bootstrap).
+
+**pixi is the tooling layer, not automatically your runtime dependency manager.** On a
+pure-Python/conda project pixi owns both. On a Rust/Go/Node stack, runtime libraries
+belong to the native manager (`Cargo.toml`, `go.mod`, `package.json`) with its own
+lockfile — pixi just *provides the toolchain* (`pixi add rust`/`go`/`nodejs`) and runs the
+criteria. So don't `pixi add` a project runtime library that belongs in the native manager.
 
 - **Run** through the env: `pixi run <task|cmd>`, `pixi shell` (interactive), or
   `pixi exec --with <pkg> <tool>` (one-off, ephemeral — nothing added to the project).
